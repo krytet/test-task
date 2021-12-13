@@ -9,15 +9,37 @@ from fastapi import FastAPI, Query
 
 app = FastAPI()
 
-industry = dd.read_csv('data/industry.csv')
-base_data = dd.read_csv('data/data.csv')
-regions = dd.read_csv('data/Regions.csv')
-federal_distrinct = dd.read_csv('data/Federal_Distrinct.csv')
+class Industry(object):
+    def __new__(cls):
+        if not hasattr(cls, 'industry'):
+            cls.industry =  dd.read_csv('data/industry.csv')
+        return cls.industry
+
+
+class BaseData(object):
+    def __new__(cls):
+        if not hasattr(cls, 'base_data'):
+            cls.base_data =  dd.read_csv('data/data.csv')
+        return cls.base_data
+
+
+class Regions(object):
+    def __new__(cls):
+        if not hasattr(cls, 'regions'):
+            cls.regions =  dd.read_csv('data/Regions.csv')
+        return cls.regions
+
+
+class FederalDistrinct(object):
+    def __new__(cls):
+        if not hasattr(cls, 'federal_distrinct'):
+            cls.federal_distrinct =  dd.read_csv('data/Federal_Distrinct.csv')
+        return cls.federal_distrinct
 
 
 def filter_data(Industry_ID, Region_ID, FederalDistrict_ID, GraduationYear,
                 Business_Size_ID, Gender, AgeFrom, AgeTo):
-    data_response = base_data
+    data_response = BaseData()
     age = range((date.today().year - AgeTo), (date.today().year - AgeFrom))
     params = {
         'Industry_ID': Industry_ID,
@@ -59,7 +81,7 @@ def AVG_salary(
     data['value'] = data['Salary'] / data['Graduates_Amount']
 
     # объеденение таблиц
-    data = dd.merge(industry, data, left_on='ID', right_on='Industry_ID')
+    data = dd.merge(Industry(), data, left_on='ID', right_on='Industry_ID')
 
     # Форматирование данных
     data = data[['ID', 'Industry', 'value']]
